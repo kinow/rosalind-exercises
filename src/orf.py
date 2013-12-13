@@ -91,33 +91,8 @@ def read_fasta(text):
     items.append(aninstance)
     return items
 
-def rname(dna):
-    rna = ''
-    for c in dna:
-        if (c == 'T'):
-            rna += 'U'
-        else:
-            rna += c
-    return rna
-
-def is_start_codon(codon):
-    return codon == 'ATG'
-
 def is_stop_codon(codon):
-    return codon_table[codon] == 'Stop'
-
-def compl(args):
-    output = ''
-    for c in args:
-        if (c == 'A'):
-            output += 'T'
-        elif (c == 'T'):
-            output += 'A'
-        elif (c == 'C'):
-            output += 'G'
-        else:
-            output += 'C'
-    return output
+    return (codon == 'TAA' or codon == 'TAG' or codon == 'TGA')
 
 if __name__ == '__main__':
     sequence = '''
@@ -126,23 +101,45 @@ AGCCATGTAGCTAACTCAGGTTACATGGGGATGACCCCGCGACTTGGATTAGAGTCTCTTTTGGAATAAGCCTGAATGAT
 '''
     for i in read_fasta(sequence):
         seq = i.sequence
-        codon = ''
-        protein = ''
-        in_protein = False
-        for c in (seq):
-            if (len(codon) == 3):
-                if (is_start_codon(codon)):
-                    print codon, 'is start'
-                    in_protein = True
-                    protein += codon_table[codon]
-                elif (is_stop_codon(codon) and in_protein):
-                    in_protein = False
-                    protein = ''
-                    codon = ''
-                    continue
-                elif in_protein:
-                    protein += codon
+
+        start = 0
+        end = len(seq)
+        index = seq.find('ATG', start, end)
+        start = index+3
+
+        while (index > 0) :
+            protein = 'M'
+            seq = str(seq[start:end])
+            codons = [seq[x:x+3] for x in range(0, len(seq), 3)]
+            if (len(codons) == 0):
+                break;
+            for codon in codons:
+                print codon, '->', codon_table[codon]
+                if (is_stop_codon(codon)):
+                    print protein
+                    seq = str(seq[start:end])
+                    print seq
+                    index = seq.find('ATG', start, end)
+                    print start
+                    break
                 else:
-                    continue
-                codon = ''
-            codon += c
+                    protein += codon_table[codon]
+                    start += 3
+#         codons = [seq[x:x+3] for x in range(0, len(seq), 3)]
+#
+#         for codon in codons:
+#             print 'Processing codon', codon, '->', codon_table[codon]
+#             if (is_start_codon(codon) and in_protein == False):
+#                 print codon, 'is start'
+#                 in_protein = True
+#                 protein += codon_table[codon]
+#             elif (is_stop_codon(codon) and in_protein == True):
+#                 print codon, 'is end'
+#                 in_protein = False
+#                 print '#P: ', protein
+#                 protein = ''
+#                 continue
+#             elif in_protein:
+#                 protein += codon_table[codon]
+#             else:
+#                 continue
