@@ -1,25 +1,28 @@
-''''
-n number of months
-'''
-import collections
-rabbits = collections.defaultdict(list)
 
-m = 3 # months a rabbit lives
 
-def fibo(n, current_month):
-    if (n == 1):
-        #return 1
-        rabbits[current_month].append(1)
-    elif(n == 2):
-        #return 1
-        rabbits[current_month].append(1)
-    else:
-        #return fibo(n-1)+fibo(n-2)
-        next_month = current_month+1
-        rabbits[current_month].append(fibo(n-1, next_month)+fibo(n-2, next_month))
+def fibo(n, m):
+    t = list()
+    for i in range(n):
+        if i < m:
+            if i == 0 or i == 1:
+                t.append(1)
+            else:
+                t.append(t[-1] + t[-2])
+        else:
+            rabbits = 0
+
+            for j in range(i-m, i-1):
+                rabbits = rabbits + t[j]
+
+            t.append(rabbits)
+    return t
+
+
+
+
 if __name__ == '__main__':
-    n = 6 # number of months to calculate
-    
-    fibo(n, 0)
-    
-    print rabbits
+    n = 99 # number of months to calculate
+    m = 16 # months a rabbit lives
+
+    print fibo(n, m)[-1]
+
