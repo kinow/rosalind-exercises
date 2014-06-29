@@ -14,11 +14,11 @@ def read_fasta(text):
             if index >= 1:
                 items.append(aninstance)
             index += 1
-            name = line[1:]
+            name = line[1:].replace('\n', '').replace('\t', '')
             seq = ''
             aninstance = Fasta(name, seq)
         else:
-            seq += line
+            seq += line.replace('\n', '').replace('\t', '')
             aninstance = Fasta(name, seq)
 
     items.append(aninstance)
