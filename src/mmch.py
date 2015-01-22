@@ -1,5 +1,6 @@
 from fasta.Fasta import read_fasta
 import itertools
+import networkx as nx
 
 if __name__ == '__main__':
 	data = '''
@@ -9,9 +10,12 @@ AUGCUUC
 
 	seqs = read_fasta(data)
 
-	max_mat = 0
+	G = nx.Graph()
 
-	elems = dict()
+	for s in seqs:
+		sequence = s.sequence
+        for i in xrange(0, len(sequence)):
+        	G.add_node(i)
 
 	for s in seqs:
 		sequence = s.sequence
@@ -24,14 +28,19 @@ AUGCUUC
         				left == 'U' and right == 'A' or \
         				left == 'C' and right == 'G' or \
         				left == 'G' and right == 'C'):
-	        			d = dict()
-	        			d[i] = j
-	        			if (i in elems):
-				    		elems[i].append(d)
-				    	else:
-				    		elems[i] = list()
-				    		elems[i].append(d)
+	        			e = (i, j)
+	        			G.add_edge(*e)
 
-	print elems
+	print G.edges()
+
+	matching = set([])
+	edges = set([])
+	for u,v in G.edges_iter():
+		if (u,v) not in edges and (v,u) not in edges:
+			matching.add((u,v))
+			edges |= set(G.edges(u))
+			edges |= set(G.edges(v))
+
+	print matching
 
 #	print list(itertools.combinations(sequence, 6))
