@@ -2,17 +2,31 @@ from fasta.Fasta import read_fasta
 import itertools
 import networkx as nx
 
-def search(matchings, g, node, idx):
+# I'm sure there's some well-tested algorithm for that... but I just couldn't find it... then...
+def search(matchings, g, node, idx, stack):
 	for right in g.neighbors(node):
-		if [node, right] in matchings or [right, node] in matchings:
-			if (idx + 1 < len(g.nodes())):
-				idx = idx + 1
-				search(matchings, g, g.nodes()[idx], idx)
-		matchings.append([node, right])
+		if matchings[-1].has_node(right):
+			#if (idx + 1 < len(g.nodes())):
+			#	idx = idx + 1
+			#	search(matchings, g, g.nodes()[idx], idx)
+			next
+		else:
+			edge = (node, right)
+			stack.append(edge)
+			matchings[-1].add_edge(*edge)
 		if (idx + 1 < len(g.nodes())):
 			idx = idx + 1
-			search(matchings, g, g.nodes()[idx], idx)
-	return matchings
+			search(matchings, g, g.nodes()[idx], idx, stack)
+		else:
+			if len(stack) > 0:
+				stack.pop()
+			matchings.append(nx.Graph())
+			for i in xrange(0, len(stack)):
+				edge = stack.pop()
+				matchings[-1].add_edge(*edge)
+			if len(matchings[-1]) > 0:
+				print "Stack leftover"
+				print matchings[-1].edges()
 
 if __name__ == '__main__':
 	data = '''
@@ -46,12 +60,22 @@ AUGCUUC
 	print G.edges()
 
 	matchings = list()
+	matchings.append(nx.Graph())
 
 	seed = G.nodes()[0] # initial node
-	matchings = search(matchings, G, seed, 0)
+	stack = list()
+	search(matchings, G, seed, 0, stack)
 
-	print matchings
+	i = 0
+	ms = list()
+	for g in matchings:
+		if len(g.edges()) > 0:
+			ms.append(g)
 
-	print len(matchings)
+	for g in ms:
+		print "MATCHING!"
+		print g.edges()
+
+	print len(ms)
 
 #	print list(itertools.combinations(sequence, 6))
