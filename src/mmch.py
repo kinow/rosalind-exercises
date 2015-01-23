@@ -2,6 +2,18 @@ from fasta.Fasta import read_fasta
 import itertools
 import networkx as nx
 
+def search(matchings, g, node, idx):
+	for right in g.neighbors(node):
+		if [node, right] in matchings or [right, node] in matchings:
+			if (idx + 1 < len(g.nodes())):
+				idx = idx + 1
+				search(matchings, g, g.nodes()[idx], idx)
+		matchings.append([node, right])
+		if (idx + 1 < len(g.nodes())):
+			idx = idx + 1
+			search(matchings, g, g.nodes()[idx], idx)
+	return matchings
+
 if __name__ == '__main__':
 	data = '''
 >Rosalind_92
@@ -33,14 +45,13 @@ AUGCUUC
 
 	print G.edges()
 
-	matching = set([])
-	edges = set([])
-	for u,v in G.edges_iter():
-		if (u,v) not in edges and (v,u) not in edges:
-			matching.add((u,v))
-			edges |= set(G.edges(u))
-			edges |= set(G.edges(v))
+	matchings = list()
 
-	print matching
+	seed = G.nodes()[0] # initial node
+	matchings = search(matchings, G, seed, 0)
+
+	print matchings
+
+	print len(matchings)
 
 #	print list(itertools.combinations(sequence, 6))
