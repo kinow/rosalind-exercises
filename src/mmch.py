@@ -6,18 +6,12 @@ import networkx as nx
 def search(matchings, g, idx, stack):
 	node = g.nodes()[idx]
 	for right in g.neighbors(node):
-		if matchings[-1].has_node(right):
-			#if (idx + 1 < len(g.nodes())):
-			#	idx = idx + 1
-			#	search(matchings, g, g.nodes()[idx], idx)
-			next
-		else:
+		if False == matchings[-1].has_node(right):
 			edge = (node, right)
 			stack.append(edge)
 			matchings[-1].add_edge(*edge)
 		if (idx + 1 < len(g.nodes())):
-			idx = idx + 1
-			search(matchings, g, idx, stack)
+			search(matchings, g, idx +1, stack)
 		else:
 			if len(stack) > 0:
 				stack.pop()
