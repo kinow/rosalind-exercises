@@ -6,22 +6,19 @@ import networkx as nx
 def search(matchings, g, idx, stack):
 	node = g.nodes()[idx]
 	for right in g.neighbors(node):
+		edge = (node, right)
 		if False == matchings[-1].has_node(right):
-			edge = (node, right)
 			stack.append(edge)
 			matchings[-1].add_edge(*edge)
 		if (idx + 1 < len(g.nodes())):
 			search(matchings, g, idx +1, stack)
-		else:
-			if len(stack) > 0:
+			if len(stack) > 0 and stack[-1] == edge:
 				stack.pop()
+				for i in xrange(0, len(stack)):
+					edge = stack.pop()
+					matchings[-1].add_edge(*edge)
+		else: # last node
 			matchings.append(nx.Graph())
-			for i in xrange(0, len(stack)):
-				edge = stack.pop()
-				matchings[-1].add_edge(*edge)
-			if len(matchings[-1]) > 0:
-				print "Stack leftover"
-				print matchings[-1].edges()
 
 if __name__ == '__main__':
 	data = '''
@@ -52,7 +49,7 @@ AUGCUUC
 	        			e = (i, j)
 	        			G.add_edge(*e)
 
-	print G.edges()
+	#print G.edges()
 
 	matchings = list()
 	matchings.append(nx.Graph())
@@ -66,9 +63,9 @@ AUGCUUC
 		if len(g.edges()) > 0:
 			ms.append(g)
 
-	for g in ms:
-		print "MATCHING!"
-		print g.edges()
+#	for g in ms:
+#		print "MATCHING!"
+#		print g.edges()
 
 	print len(ms)
 
