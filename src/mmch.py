@@ -3,7 +3,8 @@ import itertools
 import networkx as nx
 
 # I'm sure there's some well-tested algorithm for that... but I just couldn't find it... then...
-def search(matchings, g, node, idx, stack):
+def search(matchings, g, idx, stack):
+	node = g.nodes()[idx]
 	for right in g.neighbors(node):
 		if matchings[-1].has_node(right):
 			#if (idx + 1 < len(g.nodes())):
@@ -16,7 +17,7 @@ def search(matchings, g, node, idx, stack):
 			matchings[-1].add_edge(*edge)
 		if (idx + 1 < len(g.nodes())):
 			idx = idx + 1
-			search(matchings, g, g.nodes()[idx], idx, stack)
+			search(matchings, g, idx, stack)
 		else:
 			if len(stack) > 0:
 				stack.pop()
@@ -62,9 +63,8 @@ AUGCUUC
 	matchings = list()
 	matchings.append(nx.Graph())
 
-	seed = G.nodes()[0] # initial node
 	stack = list()
-	search(matchings, G, seed, 0, stack)
+	search(matchings, G, 0, stack)
 
 	i = 0
 	ms = list()
