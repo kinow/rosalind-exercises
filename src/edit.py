@@ -1,45 +1,29 @@
 import numpy as np
 from fasta.Fasta import read_fasta
 
-def levenshtein(source, target):
-    if len(source) < len(target):
-        return levenshtein(target, source)
- 
-    # So now we have len(source) >= len(target).
-    if len(target) == 0:
-        return len(source)
- 
-    # We call tuple() to force strings to be used as sequences
-    # ('c', 'a', 't', 's') - numpy uses them as values by default.
-    source = np.array(tuple(source))
-    target = np.array(tuple(target))
- 
-    # We use a dynamic programming algorithm, but with the
-    # added optimization that we only need the last two rows
-    # of the matrix.
-    previous_row = np.arange(target.size + 1)
-    for s in source:
-        # Insertion (target grows longer than source):
-        current_row = previous_row + 1
- 
-        # Substitution or matching:
-        # Target and source items are aligned, and either
-        # are different (cost of 1), or are the same (cost of 0).
-        current_row[1:] = np.minimum(
-                current_row[1:],
-                np.add(previous_row[:-1], target != s))
- 
-        # Deletion (target grows shorter than source):
-        current_row[1:] = np.minimum(
-                current_row[1:],
-                current_row[0:-1] + 1)
- 
-        previous_row = current_row
- 
-    return previous_row[-1]
+# hetland.org/coding/python/levenshtein.py
+def levenshtein(a,b):
+    "Calculates the Levenshtein distance between a and b."
+    n, m = len(a), len(b)
+    if n > m:
+        # Make sure n <= m, to use O(min(n,m)) space
+        a,b = b,a
+        n,m = m,n
+        
+    current = range(n+1)
+    for i in range(1,m+1):
+        previous, current = current, [i]+[0]*n
+        for j in range(1,n+1):
+            add, delete = previous[j]+1, current[j-1]+1
+            change = previous[j-1]
+            if a[j-1] != b[i-1]:
+                change = change + 1
+            current[j] = min(add, delete, change)
+            
+    return current[n]
 
 if __name__ == '__main__':
-	data = open("rosalind_edit.txt", 'r').read()
-	fasta = read_fasta(data)
-	print levenshtein(fasta[0].sequence, fasta[1].sequence)
-	print levenshtein('PLEASANTLY', 'MEANLY')
+    data = open("rosalind_edit_1_dataset.txt", 'r').read()
+    fasta = read_fasta(data)
+    print levenshtein(fasta[0].sequence, fasta[1].sequence)
+    #print levenshtein('PLEASANTLY', 'MEANLY')
